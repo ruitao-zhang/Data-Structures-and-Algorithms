@@ -1,4 +1,4 @@
-LATEX = pdflatex
+LATEX = Xelatex
 TEXFILE = report
 PDFVIEWER = xdg-open  
 
