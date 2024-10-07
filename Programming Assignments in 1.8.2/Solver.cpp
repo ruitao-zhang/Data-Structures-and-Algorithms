@@ -207,7 +207,6 @@ int main() {
         return std::make_tuple(func, derivative);
     };
 
-    // 使用 std::get 提取 calculateCoefficients 返回的元组中的值
     std::tuple<double, double, double, double> coefficients1 = calculateCoefficients(D1);
     double A1 = std::get<0>(coefficients1);
     double B1 = std::get<1>(coefficients1);
@@ -222,7 +221,6 @@ int main() {
     double alpha1_rad = newtonSolver1.solve(degreesToRadians(33));
     std::cout << "Verified alpha for D = 55 inches: " << radiansToDegrees(alpha1_rad) << " degrees" << std::endl;
 
-    // 使用 calculateCoefficients 计算 D2 情况下的系数
     std::tuple<double, double, double, double> coefficients2 = calculateCoefficients(D2);
     double A2 = std::get<0>(coefficients2);
     double B2 = std::get<1>(coefficients2);
