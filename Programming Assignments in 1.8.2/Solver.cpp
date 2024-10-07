@@ -123,6 +123,10 @@ int main() {
     BisectionSolver bisect3(1.0, 3.0, 0.0001, func3);
     std::cout << "Root of 2^(-x) + e^x + 2cos(x) - 6 in [1, 3]: " << bisect3.solve() << std::endl;
 
+    auto func4 = [](double x) { return (x * x * x + 4 * x * x + 3 * x + 5) / (2 * x * x * x - 9 * x * x + 18 * x - 2); };
+    BisectionSolver bisect4(0.1, 4.0, 0.0001, func4);
+    std::cout << "Root of rational function in [0, 4]: " << bisect4.solve() << std::endl;
+
     // 3. 牛顿法求解 x = tan(x)
     std::cout << "=== 问题3: 牛顿法求解 x = tan(x) ===";
 
