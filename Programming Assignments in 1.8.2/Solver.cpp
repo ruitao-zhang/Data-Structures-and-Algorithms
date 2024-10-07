@@ -92,22 +92,6 @@ double radiansToDegrees(double radians) {
 }
 
 int main() {
-	    // 1. 实现三种方法的测试
-    std::cout << " === 问题1: 实现并测试不同的求解方法 ===";
-    
-    // 测试函??: f(x) = x^2 - 2
-    auto func = [](double x) { return x * x - 2; };
-    auto derivative = [](double x) { return 2 * x; };
-
-    BisectionSolver bisect(1.0, 2.0, 0.0001, func);
-    std::cout << "Bisection Method root: " << bisect.solve() << std::endl;
-
-    NewtonSolver newton(0.0001, func, derivative);
-    std::cout << "Newton's Method root: " << newton.solve(1.0) << std::endl;
-
-    SecantSolver secant(0.0001, func);
-    std::cout << "Secant Method root: " << secant.solve(1.0, 2.0) << std::endl;
-
     // 2. 使用二分法测试特定函数
     std::cout << "=== 问题2: 测试二分法 ===";
 
