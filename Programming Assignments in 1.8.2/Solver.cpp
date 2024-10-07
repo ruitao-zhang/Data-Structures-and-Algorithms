@@ -142,20 +142,38 @@ int main() {
     // 4. 使用割线法测试
     std::cout << "=== 问题4: 测试割线法 ===";
 
-    auto func_secant1 = [](double x) { return std::sin(x / 2) - 1; };
+        auto func_secant1 = [](double x) { return std::sin(x / 2) - 1; };
     SecantSolver secant1(0.0001, func_secant1);
+
+    // 原初值 0 和 pi/2
     std::cout << "Secant Method root of sin(x/2) - 1 with initial values 0 and pi/2: "
               << secant1.solve(0, M_PI / 2) << std::endl;
 
+    // 新初值 0.1 和 1.5
+    std::cout << "Secant Method root of sin(x/2) - 1 with new initial values 0.1 and 1.5: "
+              << secant1.solve(0.1, 1.5) << std::endl;
+
     auto func_secant2 = [](double x) { return std::exp(x) - std::tan(x); };
     SecantSolver secant2(0.0001, func_secant2);
+
+    // 原初值 1 和 1.4
     std::cout << "Secant Method root of e^x - tan(x) with initial values 1 and 1.4: "
               << secant2.solve(1, 1.4) << std::endl;
 
+    // 新初值 0.5 和 1.3
+    std::cout << "Secant Method root of e^x - tan(x) with new initial values 0.5 and 1.3: "
+              << secant2.solve(0.5, 1.3) << std::endl;
+
     auto func_secant3 = [](double x) { return x * x * x - 12 * x * x + 3 * x + 1; };
     SecantSolver secant3(0.0001, func_secant3);
+
+    // 原初值 0 和 -0.5
     std::cout << "Secant Method root of x^3 - 12x^2 + 3x + 1 with initial values 0 and -0.5: "
               << secant3.solve(0, -0.5) << std::endl;
+
+    // 新初值 1 和 2
+    std::cout << "Secant Method root of x^3 - 12x^2 + 3x + 1 with new initial values 1 and 2: "
+              << secant3.solve(1, 2) << std::endl;
 
     // 5. 体积问题
     std::cout << "=== 问题5: 体积问题 ===";
