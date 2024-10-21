@@ -73,26 +73,26 @@
 
 \section*{测试程序的设计思路及结果}
 \section{测试设计}
-\subsection{元素插入}
+\subsection{插入元素}
 测试首先使用 \texttt{push\_back} 函数向链表中插入元素。该函数将元素追加到链表的末尾。通过一个循环向链表中插入 0, 1, 2, 3, 4。
 
-\subsection{迭代器的自增和自减操作}
+\subsection{自增和自减操作}
 在插入元素后，测试通过迭代器验证自增（\texttt{++}）和自减（\texttt{--}）操作的正确性。首先测试前向迭代，使用 \texttt{++} 运算符从链表的头部遍历到尾部。接着，测试后向迭代，使用 \texttt{--} 运算符从链表的尾部回到头部。
 
 \subsection{头尾访问}
 \texttt{front} 和 \texttt{back} 函数分别返回链表的第一个元素和最后一个元素的引用。通过测试，确保这些函数在插入元素后能正确返回期望的元素。
 
-\subsection{元素删除}
+\subsection{删除元素}
 通过 \texttt{pop\_front} 和 \texttt{pop\_back} 函数，测试从链表头部和尾部删除元素的功能，并打印链表内容以验证操作的正确性。
 
-\subsection{区间删除}
-测试 \texttt{erase} 函数，它允许使用迭代器删除链表中的一段元素。在测试中，删除链表中从第二个元素到尾部的所有元素。
+\subsection{删除区间}
+测试 \texttt{erase} 函数，使用它删除链表中从第二个元素到尾部的所有元素。
 
 \subsection{清空链表}
 测试 \texttt{clear} 函数，确保该函数能删除链表中的所有元素，并且链表的大小正确更新为 0。
 
 \section{测试结果}
-\subsection{元素插入}
+\subsection{插入元素}
 使用 \texttt{push\_back} 插入元素时，链表正确存储了从 0 到 4 的值。通过迭代器遍历链表时，按顺序输出这些元素，符合预期。
 
 \begin{verbatim}
@@ -100,7 +100,7 @@
 链表插入后的结果: 0 1 2 3 4
 \end{verbatim}
 
-\subsection{迭代器的自增和自减操作}
+\subsection{自增和自减操作}
 在迭代器测试中，\texttt{++} 运算符正确地从链表头部遍历到了链表末尾，\texttt{--} 运算符则成功地从链表末尾回溯到链表头部。
 
 \begin{verbatim}
@@ -116,14 +116,14 @@ front: 0
 back: 4
 \end{verbatim}
 
-\subsection{元素删除}
+\subsection{删除元素}
 通过 \texttt{pop\_front} 删除链表的第一个元素，并通过 \texttt{pop\_back} 删除链表的最后一个元素后，链表的剩余元素输出正确。
 
 \begin{verbatim}
 删除头尾元素后的链表: 1 2 3
 \end{verbatim}
 
-\subsection{区间删除}
+\subsection{删除元素}
 \texttt{erase} 函数成功删除了链表中从第二个位置到最后一个位置的元素，最终链表中只剩下第一个元素。
 
 \begin{verbatim}
