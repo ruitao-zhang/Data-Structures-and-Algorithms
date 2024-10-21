@@ -61,7 +61,7 @@ int main()
 
     std::cout << "清空链表:" << std::endl;
     lst.clear();
-    std::cout << "List size after clear: " << lst.size() << std::endl;
+    std::cout << lst.size() << std::endl;
     
     return 0;
 }
