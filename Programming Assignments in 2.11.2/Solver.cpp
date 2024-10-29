@@ -129,7 +129,7 @@ int main() {
     // Part (b): Check if the car ever exceeds the speed limit (81 feet per second)
     bool exceedsSpeedLimit = false;
     for (double t = time.front(); t <= time.back(); t += 0.1) {
-        double velocityAtT = hermiteInterpolateDerivative(time, displacement, velocity, t);
+        double velocityAtT = hermite1(time, displacement, velocity, t);
         if (velocityAtT > 81.0) {
             exceedsSpeedLimit = true;
             break;
@@ -147,17 +147,17 @@ int main() {
     std::vector<double> sp1 = {6.67, 17.3, 42.7, 37.3, 30.1, 29.3, 28.7};
     std::vector<double> sp2 = {6.67, 16.1, 18.9, 15.0, 10.6, 9.44, 8.89};
     double day = 43;
-    double sp1 = newton(days, sp1, day)/1000;
-    double sp2 = newton(days, sp2, day)/1000;
-    if (sp1 <= 0) {
-        std::cout << "sp1 die." << std::endl;
+    double sp_1 = newton(days, sp1, day)/1000;
+    double sp_2 = newton(days, sp2, day)/1000;
+    if (sp_1 <= 0) {
+        std::cout << "sp1: " << sp_1 << "  die" <<std::endl;
     } else {
-        std::cout << "sp1 survive." << std::endl;
+        std::cout << "sp1: " << sp_1 << "  survive" << std::endl;
     }
-    if (sp2 <= 0) {
-        std::cout << "sp2 die." << std::endl;
+    if (sp_2 <= 0) {
+        std::cout << "sp2: " << sp_2 << "  die" << std::endl;
     } else {
-        std::cout << "sp2 survive." << std::endl;
+        std::cout << "sp2: " << sp_2 << "  survive" << std::endl;
     }
 
     // 第六个问题：近似心形曲线
