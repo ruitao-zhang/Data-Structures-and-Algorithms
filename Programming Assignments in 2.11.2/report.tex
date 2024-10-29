@@ -1,0 +1,328 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{xeCJK}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\lstset{
+  language=C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{green},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{Programming Assignments in 2.11.2}
+
+\author{张睿涛 Zhang Ruitao 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+
+\date{Due time: \today}
+
+\maketitle
+
+
+
+\section*{A}
+\subsection*{说明}
+\noindent 1. $x$: \texttt{const std::vector<double>\& x} \\
+\\
+这是输入的 $x$ 值的向量，插值节点。$x$ 是包含 $n$ 个不同 $x_i$ 值的向量。\\
+\\
+2. $y$: \texttt{const std::vector<double>\& y} \\
+\\
+这是输入的 $y$ 值的向量，代表对应于 $x$ 的函数值 $f(x)$。\\
+\\
+3. $target$: \texttt{double target}\\
+\\
+这是目标点 $x$，希望通过插值多项式 $p_n(f; x_0, x_1, \dots, x_n)$ 来估算函数 $f$ 在该点处的值。\\
+\\
+4. $Diff$: \texttt{std::vector<std::vector<double>> Diff}\\
+\\
+这是一个二维数组，用于存储差商表格。其大小为 $n \times n$，其中 $\texttt{Diff}[i][j]$ 表示第 $i$ 行，第 $j$ 列的差商值。\\
+\\
+\subsection*{算法流程}
+\subsubsection*{1. 输入}
+给定一个有序的点集 $(x_0, x_1, \dots, x_n)$ 和对应的 $f(x_i)$ 值。
+
+\subsubsection*{2. 构建差商表格}
+\begin{itemize}
+    \item 初始化一个二维数组 \texttt{Diff}，其中 \texttt{Diff[i][0]} 表示函数值 $f(x_i)$。
+    \item 利用递归公式计算高阶差商：
+    \[
+    f[x_i, x_{i+1}, \dots, x_{i+j}] = \frac{f[x_{i+1}, \dots, x_{i+j}] - f[x_i, \dots, x_{i+j-1}]}{x_{i+j} - x_i}
+    \]
+    \item 逐步完善差商表格 \texttt{Diff}。
+\end{itemize}
+
+\subsubsection*{3. 计算插值多项式}
+\begin{itemize}
+    \item 初始化 \texttt{result = Diff[0][0]}。
+    \item 然后递归构建多项式：
+    \[
+    P_n(x) = f[x_0] + f[x_0, x_1](x - x_0) + f[x_0, x_1, x_2](x - x_0)(x - x_1) + \dots
+    \]
+    \item 逐项累加差商乘以多项式。
+\end{itemize}
+
+\subsection*{4. 返回插值结果}
+返回 \texttt{result}，即插值多项式 $P_n(x)$ 在目标点处的值。
+
+\subsection*{流程图}
+
+\begin{verbatim}
+Start
+  |
+  V
+Input: x (插值点), y (函数值), target (目标点)
+  |
+  V
+Initialize: Diff (差商表)
+  |
+  V
+Step 1: 构建分差表 Diff
+  - For each i, set Diff[i][0] = y[i]
+  - For each j from 1 to n-1:
+      For each i from 0 to n-j-1:
+        Compute Diff[i][j] using divided difference formula
+  |
+  V
+Step 2: 在目标处计算插值多项式
+  - Initialize result = Diff[0][0]
+  - Initialize product = 1.0
+  - For i = 1 to n-1:
+      Update product *= (target - x[i-1])
+      Update result += Diff[0][i] * product
+  |
+  V
+Step 3: Return result
+  |
+  V
+End
+\end{verbatim}
+\section*{B，C}
+\subsection*{解答}
+对于区间 $[-5, 5]$ 从 $x_{\text{start}}$ 到 $x_{\text{end}}$ 以步长 $0.1$ 遍历每个 $x$。
+
+对于每个 $n$，计算插值节点 $x_i$ 和对应的函数值 $f_i$。
+
+节点 $x_i$ 的选择是等间距划分的节点，从 $x_{\text{start}}$ 到 $x_{\text{end}}$，一共 $n+1$ 个节点。
+
+使用 \texttt{newton} 函数进行牛顿插值，其中 $x_i$ 是插值节点，$f_i$ 是插值节点对应的函数值，$x$ 是需要插值的点。
+
+将当前 $x$、$f(x)$ 以及插值多项式的值 $p_n(x)$ 写入文件。
+
+最后使用文件中的数据利用python绘图。
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=0.6\textwidth]{Figure_1.png}
+\end{figure}
+\section*{D}
+\subsection*{说明}
+\begin{itemize}
+    \item \texttt{hermite} 函数：用于计算 Hermite 插值多项式的值，给定时间点 \( t \) 输出相应的位移。
+    \item \texttt{hermite1} 函数：计算 Hermite 插值多项式的一阶导数，用于预测在给定时间 \( t \) 的速度。
+\end{itemize}
+
+\subsection*{算法流程}
+\subsubsection*{hermite}
+该函数的输入为时间、位移和速度的向量及所需预测的时间点 \( t \)。核心计算是将给定时间点 \( t \) 映射到相邻的时间区间 \([t_0, t_1]\) 内，并使用 Hermite 基函数对该区间的位移和速度进行插值。
+\\
+\\
+\\
+\\
+
+\begin{algorithm}
+\caption{Hermite 插值函数}
+\begin{algorithmic}[1]
+\STATE 输入：\texttt{time}（时间），\texttt{displacement}（位移），\texttt{velocity}（速度），\texttt{t}（预测的时间）
+\STATE 初始化 \texttt{result} 为 $0$
+\FOR{每一个区间 \([t_0, t_1]\)}
+    \IF{\( t \in [t_0, t_1] \)}
+        \STATE 计算参数 \( u = \frac{t - t_0}{t_1 - t_0} \)
+        \STATE 将 \( s_0 \)、\( v_0 \)、\( s_1 \)、\( v_1 \) 分别赋值为区间端点的位移和速度
+        \STATE 使用函数计算 Hermite 插值值：\\
+        \quad \texttt{result +=} \( s_0 \cdot h_1(u) + v_0 \cdot (t_1 - t_0) \cdot h_2(u) + s_1 \cdot h_3(u) + v_1 \cdot (t_1 - t_0) \cdot h_4(u) \)
+        \STATE 跳出循环
+    \ENDIF
+\ENDFOR
+\RETURN \texttt{result}
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection*{hermite1}
+流程与 \texttt{hermite} 类似，主要区别在于使用导数形式的函数计算 Hermite 插值多项式的导数。
+
+\begin{algorithm}
+\caption{Hermite 插值导数函数}
+\begin{algorithmic}[t]
+\STATE 输入：\texttt{time}（时间向量），\texttt{displacement}（位移向量），\texttt{velocity}（速度向量），\texttt{t}（预测时间）
+\STATE 初始化 \texttt{result} 为 $0$
+\FOR{每一个区间 \([t_0, t_1]\)}
+    \IF{\( t \in [t_0, t_1] \)}
+        \STATE 计算参数 \( u = \frac{t - t_0}{t_1 - t_0} \) 和区间长度 \texttt{dt} 为 \( t_1 - t_0 \)
+        \STATE 将 \( s_0 \)、\( v_0 \)、\( s_1 \)、\( v_1 \) 分别赋值为区间端点的位移和速度
+        \STATE 使用导数函数计算 Hermite 插值导数：\\
+        \quad \texttt{result +=} \( s_0 \cdot h_{11}(u, \texttt{dt}) + v_0 \cdot h_{21}(u, \texttt{dt}) \cdot \texttt{dt} + s_1 \cdot h_{31}(u, \texttt{dt}) + v_1 \cdot h_{41}(u, \texttt{dt}) \cdot \texttt{dt} \)
+        \STATE 跳出循环
+    \ENDIF
+\ENDFOR
+\RETURN \texttt{result}
+\end{algorithmic}
+\end{algorithm}
+
+\section*{E}
+\subsection*{解答}
+即通过 $newton(days, sp1, day)$ 和 $newton(days, sp2, day)$ 计算两个样本在第 43 天的平均重量。通过牛顿插值多项式返回在给定 day 上的重量近似值。
+\begin{lstlisting}
+int main(){
+    std::vector<double> days = {0, 6, 10, 13, 17, 20, 28};
+    std::vector<double> sp1 = {6.67, 17.3, 42.7, 37.3, 30.1, 29.3, 28.7};
+    std::vector<double> sp2 = {6.67, 16.1, 18.9, 15.0, 10.6, 9.44, 8.89};
+    double day = 43;
+    double sp_1 = newton(days, sp1, day)/1000;
+    double sp_2 = newton(days, sp2, day)/1000;
+    if (sp_1 <= 0) {
+        std::cout << "sp1: " << sp_1 << "  die" <<std::endl;
+    } else {
+        std::cout << "sp1: " << sp_1 << "  survive" << std::endl;
+    }
+    if (sp_2 <= 0) {
+        std::cout << "sp2: " << sp_2 << "  die" << std::endl;
+    } else {
+        std::cout << "sp2: " << sp_2 << "  survive" << std::endl;
+    }
+\end{lstlisting}
+\section*{F}
+\subsection*{解答}
+1. 生成心形曲线的点
+
+首先，利用给定的心形曲线方程：
+\[
+x^2 + \left(1.5y - \sqrt{|x|}\right)^2 = 3
+\]
+生成一组符合此方程的点 \((x, y)\)，作为逼近贝塞尔曲线的标记点。定义了函数 \texttt{heart\_curve(n\_points)}，它接受一个参数 \(n\_points\)，表示生成的点数量。
+
+2. 计算切线
+
+为计算每个标记点处的切线，使用有限差分，函数 \texttt{calculate\_tangents(points)} 基于标记点之间的坐标差值近似切线。
+
+3. 构建三次贝塞尔曲线段
+
+根据 Algorithm 2.74 的公式，每对相邻的标记点 \(p_j\) 和 \(p_{j+1}\) 可以构建一个三次贝塞尔曲线段。对于每个标记点对 \(p_j\) 和 \(p_{j+1}\)，贝塞尔曲线段的控制点 \((q_0, q_1, q_2, q_3)\) 计算如下：
+\[
+q_0 = p_j
+\]
+\[
+q_1 = p_j + \frac{1}{3} \gamma'(p_j)
+\]
+\[
+q_2 = p_{j+1} - \frac{1}{3} \gamma'(p_j)
+\]
+\[
+q_3 = p_{j+1}
+\]
+其中，\(\gamma'(p_j)\) 表示第 \(p_j\) 点的切线向量。构造函数 \texttt{bezier\_points(p0, p1, tangent)} 使用此公式构造单个贝塞尔曲线段。
+
+4. 贝塞尔曲线的绘制
+
+为了得到三次贝塞尔曲线段在不同参数 \(t\) 值下的坐标，定义函数 \texttt{evaluate(segment, t)}。利用贝塞尔曲线的参数方程，对每个 \(t\) 计算出曲线上的点，并返回这些点的坐标。
+
+5. 绘制心形曲线和贝塞尔逼近
+\begin{lstlisting}
+    # Heart
+def heart_curve(n_points):
+    x = np.linspace(-np.sqrt(3), np.sqrt(3), n_points)
+    y_1 = (np.sqrt(3 - x**2) + np.sqrt(np.abs(x))) / 1.5
+    y_0 = (-np.sqrt(3 - x**2) + np.sqrt(np.abs(x))) / 1.5
+    points_1 = np.column_stack((x, y_1))
+    points_0 = np.column_stack((x, y_0))
+    return np.concatenate((points_1, points_0[::-1]), axis=0)
+
+def Tangents(points):
+    tangents = np.gradient(points, axis=0)
+    return tangents
+
+def bezier_points(p0, p1, tangent):
+    q0 = p0
+    q1 = p0 + (1 / 3) * tangent
+    q2 = p1 - (1 / 3) * tangent
+    q3 = p1
+    return np.array([q0, q1, q2, q3])
+
+def bezier_curve(points, tangents):
+    segments = []
+    for j in range(len(points) - 1):
+        segments.append(bezier_points(points[j], points[j+1], tangents[j]))
+    return segments
+
+def evaluate(segment, t):
+    q0, q1, q2, q3 = segment
+    return ((1 - t)**3)[:, None] * q0 + \
+           (3 * (1 - t)**2 * t)[:, None] * q1 + \
+           (3 * (1 - t) * t**2)[:, None] * q2 + \
+           (t**3)[:, None] * q3
+
+def plot_22(m1):
+    heart_points = heart_curve(200)
+
+    plt.figure(figsize=(8, 8))
+    plt.plot(heart_points[:, 0], heart_points[:, 1], 'k-', label="True Heart")
+
+    for m in m1:
+        points = heart_curve(m+1)
+        tangents = Tangents(points)
+
+        segments = bezier_curve(points, tangents)
+
+        points_all = np.vstack([
+            evaluate(segment, np.linspace(0, 1, 100))
+            for segment in segments
+        ])
+
+        plt.plot(points_all[:, 0], points_all[:, 1], label=f'Bezier m={m}')
+
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title("Heart Curve and Bezier Approximations")
+    plt.legend()
+    plt.grid(True)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
+
+m1 = [10, 40, 160]
+plot_22(m1)
+\end{lstlisting}
+
+用函数 \texttt{plot\_22(m1)} 绘制。
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=0.6\textwidth]{Figure_3.png}
+\end{figure}
+
+
+
+\end{document}
