@@ -5,43 +5,43 @@
 #include <iomanip>
 
 // 牛顿插值法的实现
-double newtonInterpolation(const std::vector<double>& x, const std::vector<double>& y, double target) {
+double newton(const std::vector<double>& x, const std::vector<double>& y, double target) {
     int n = x.size();
-    std::vector<std::vector<double>> dividedDiffs(n, std::vector<double>(n));
+    std::vector<std::vector<double>> Diff(n, std::vector<double>(n));
 
     for (int i = 0; i < n; i++) {
-        dividedDiffs[i][0] = y[i];
+        Diff[i][0] = y[i];
     }
 
     for (int j = 1; j < n; j++) {
         for (int i = 0; i < n - j; i++) {
-            dividedDiffs[i][j] = (dividedDiffs[i + 1][j - 1] - dividedDiffs[i][j - 1]) / (x[i + j] - x[i]);
+            Diff[i][j] = (Diff[i + 1][j - 1] - Diff[i][j - 1]) / (x[i + j] - x[i]);
         }
     }
 
-    double result = dividedDiffs[0][0];
+    double result = Diff[0][0];
     double product = 1.0;
     for (int i = 1; i < n; i++) {
         product *= (target - x[i - 1]);
-        result += dividedDiffs[0][i] * product;
+        result += Diff[0][i] * product;
     }
     return result;
 }
 
 // Hermite basis functions and their derivatives
-double h00(double u) { return (1 + 2 * u) * (1 - u) * (1 - u); }
-double h10(double u) { return u * (1 - u) * (1 - u); }
-double h01(double u) { return u * u * (3 - 2 * u); }
-double h11(double u) { return u * u * (u - 1); }
+double h1(double u) { return (1 + 2 * u) * (1 - u) * (1 - u); }
+double h2(double u) { return u * (1 - u) * (1 - u); }
+double h3(double u) { return u * u * (3 - 2 * u); }
+double h4(double u) { return u * u * (u - 1); }
 
 // Derivatives of the Hermite basis functions
-double h00_prime(double u, double dt) { return (6 * u * (u - 1)) / dt; }
-double h10_prime(double u, double dt) { return (3 * u * u - 4 * u + 1) / dt; }
-double h01_prime(double u, double dt) { return (-6 * u * (u - 1)) / dt; }
-double h11_prime(double u, double dt) { return (3 * u * u - 2 * u) / dt; }
+double h11(double u, double dt) { return (6 * u * (u - 1)) / dt; }
+double h21(double u, double dt) { return (3 * u * u - 4 * u + 1) / dt; }
+double h31(double u, double dt) { return (-6 * u * (u - 1)) / dt; }
+double h41(double u, double dt) { return (3 * u * u - 2 * u) / dt; }
 
 // Hermite interpolation function for displacement
-double hermiteInterpolate(const std::vector<double>& time, const std::vector<double>& displacement, const std::vector<double>& velocity, double t) {
+double hermite(const std::vector<double>& time, const std::vector<double>& displacement, const std::vector<double>& velocity, double t) {
     double result = 0.0;
     for (size_t i = 0; i < time.size() - 1; ++i) {
         double t0 = time[i], t1 = time[i + 1];
@@ -50,8 +50,8 @@ double hermiteInterpolate(const std::vector<double>& time, const std::vector<dou
 
         if (t >= t0 && t <= t1) {
             double u = (t - t0) / (t1 - t0);
-            result += s0 * h00(u) + v0 * (t1 - t0) * h10(u)
-                    + s1 * h01(u) + v1 * (t1 - t0) * h11(u);
+            result += s0 * h1(u) + v0 * (t1 - t0) * h2(u)
+                    + s1 * h3(u) + v1 * (t1 - t0) * h4(u);
             break;
         }
     }
@@ -59,7 +59,7 @@ double hermiteInterpolate(const std::vector<double>& time, const std::vector<dou
 }
 
 // Derivative of Hermite interpolation for velocity
-double hermiteInterpolateDerivative(const std::vector<double>& time, const std::vector<double>& displacement, const std::vector<double>& velocity, double t) {
+double hermite1(const std::vector<double>& time, const std::vector<double>& displacement, const std::vector<double>& velocity, double t) {
     double result = 0.0;
     for (size_t i = 0; i < time.size() - 1; ++i) {
         double t0 = time[i], t1 = time[i + 1];
@@ -69,8 +69,8 @@ double hermiteInterpolateDerivative(const std::vector<double>& time, const std::
 
         if (t >= t0 && t <= t1) {
             double u = (t - t0) / dt;
-            result += s0 * h00_prime(u, dt) + v0 * h10_prime(u, dt) * dt
-                    + s1 * h01_prime(u, dt) + v1 * h11_prime(u, dt) * dt;
+            result += s0 * h11(u, dt) + v0 * h21(u, dt) * dt
+                    + s1 * h31(u, dt) + v1 * h41(u, dt) * dt;
             break;
         }
     }
@@ -78,7 +78,7 @@ double hermiteInterpolateDerivative(const std::vector<double>& time, const std::
 }
 
 // 生成 Runge 现象和 Chebyshev 插值的数据
-void generateData(const std::vector<int>& ns, double (*f)(double), const std::string& filename_prefix, double x_start, double x_end) {
+void Data(const std::vector<int>& ns, double (*f)(double), const std::string& filename_prefix, double x_start, double x_end) {
     for (int n : ns) {
         std::ofstream file(filename_prefix + std::to_string(n) + ".txt");
         file << std::fixed << std::setprecision(5); // 固定小数位数
@@ -91,7 +91,7 @@ void generateData(const std::vector<int>& ns, double (*f)(double), const std::st
                 xi.push_back(xi_val);
                 fi.push_back(f(xi_val));
             }
-            file << x << "\t" << f(x) << "\t" << newtonInterpolation(xi, fi, x) << "\n";
+            file << x << "\t" << f(x) << "\t" << newton(xi, fi, x) << "\n";
         }
         file.close();
     }
@@ -117,29 +117,29 @@ int main() {
     std::vector<double> displacement = {0, 225, 383, 623, 993};
     std::vector<double> velocity = {75, 77, 80, 74, 72};
 
-    double targetTime = 10.0;
+    double Time = 10.0;
 
     // Part (a): Predict displacement and velocity at t = 10
-    double predictedPosition = hermite(time, displacement, velocity, targetTime);
-    double predictedVelocity = hermite1(time, displacement, velocity, targetTime);
+    double Position = hermite(time, displacement, velocity, Time);
+    double Velocity = hermite1(time, displacement, velocity, Time);
 
-    std::cout << "position: " << predictedPosition << " feet" << std::endl;
-    std::cout << "velocity: " << predictedVelocity << " feet per second" << std::endl;
+    std::cout << "position: " << Position << " feet" << std::endl;
+    std::cout << "velocity: " << Velocity << " feet per second" << std::endl;
 
     // Part (b): Check if the car ever exceeds the speed limit (81 feet per second)
-    bool exceedsSpeedLimit = false;
+    bool Limit = false;
     for (double t = time.front(); t <= time.back(); t += 0.1) {
-        double velocityAtT = hermite1(time, displacement, velocity, t);
-        if (velocityAtT > 81.0) {
-            exceedsSpeedLimit = true;
+        double speed = hermite1(time, displacement, velocity, t);
+        if (speed > 81.0) {
+            Limit = true;
             break;
         }
     }
 
-    if (exceedsSpeedLimit) {
-        std::cout << "The car exceeds the speed limit of 81 feet per second." << std::endl;
+    if (Limit) {
+        std::cout << "Overspped" << std::endl;
     } else {
-        std::cout << "The car does not exceed the speed limit of 81 feet per second." << std::endl;
+        std::cout << "No overspeed" << std::endl;
     }
 
     // 第五个问题：幼虫体重预测
