@@ -159,17 +159,5 @@ int main() {
     } else {
         std::cout << "sp2: " << sp_2 << "  survive" << std::endl;
     }
-
-    // 第六个问题：近似心形曲线
-    // 使用 Python 绘制
-    std::ofstream bezier_file("heart_curve.txt");
-    bezier_file << "x y";
-    for (double theta = -3.14; theta <= 3.14; theta += 0.01) {
-        double x = 2 * std::pow(sin(theta), 3);
-        double y = 1.5 * cos(theta) - 0.6 * cos(2 * theta) - 0.3 * cos(3 * theta) - 0.1 * cos(4 * theta);
-        bezier_file << x << " " << y << "";
-    }
-    bezier_file.close();
-
     return 0;
 }
