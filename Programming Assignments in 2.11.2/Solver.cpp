@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iomanip>
 
-// 牛顿插值法的实现
+// 牛顿插值
 double newton(const std::vector<double>& x, const std::vector<double>& y, double target) {
     int n = x.size();
     std::vector<std::vector<double>> Diff(n, std::vector<double>(n));
@@ -28,19 +28,17 @@ double newton(const std::vector<double>& x, const std::vector<double>& y, double
     return result;
 }
 
-// Hermite basis functions and their derivatives
+// Hermite 
 double h1(double u) { return (1 + 2 * u) * (1 - u) * (1 - u); }
 double h2(double u) { return u * (1 - u) * (1 - u); }
 double h3(double u) { return u * u * (3 - 2 * u); }
 double h4(double u) { return u * u * (u - 1); }
 
-// Derivatives of the Hermite basis functions
 double h11(double u, double dt) { return (6 * u * (u - 1)) / dt; }
 double h21(double u, double dt) { return (3 * u * u - 4 * u + 1) / dt; }
 double h31(double u, double dt) { return (-6 * u * (u - 1)) / dt; }
 double h41(double u, double dt) { return (3 * u * u - 2 * u) / dt; }
 
-// Hermite interpolation function for displacement
 double hermite(const std::vector<double>& time, const std::vector<double>& displacement, const std::vector<double>& velocity, double t) {
     double result = 0.0;
     for (size_t i = 0; i < time.size() - 1; ++i) {
@@ -58,7 +56,6 @@ double hermite(const std::vector<double>& time, const std::vector<double>& displ
     return result;
 }
 
-// Derivative of Hermite interpolation for velocity
 double hermite1(const std::vector<double>& time, const std::vector<double>& displacement, const std::vector<double>& velocity, double t) {
     double result = 0.0;
     for (size_t i = 0; i < time.size() - 1; ++i) {
@@ -77,7 +74,7 @@ double hermite1(const std::vector<double>& time, const std::vector<double>& disp
     return result;
 }
 
-// 生成 Runge 现象和 Chebyshev 插值的数据
+//  Runge 和 Chebyshev 
 void Data(const std::vector<int>& ns, double (*f)(double), const std::string& filename_prefix, double x_start, double x_end) {
     for (int n : ns) {
         std::ofstream file(filename_prefix + std::to_string(n) + ".txt");
@@ -97,21 +94,19 @@ void Data(const std::vector<int>& ns, double (*f)(double), const std::string& fi
     }
 }
 
-// 主函数
 int main() {
-     // 定义目标函数
     auto f1 = [](double x) { return 1.0 / (1 + x * x); };
     auto f2 = [](double x) { return 1.0 / (1 + 25 * x * x); };
 
-    // 生成 Runge 现象的插值数据
+    // Runge
     std::vector<int> ns1 = {2, 4, 6, 8};
     Data(ns1, f1, "runge_n", -5, 5);
 
-    // 生成 Chebyshev 插值的数据
+    // Chebyshev
     std::vector<int> ns2 = {5, 10, 15, 20};
     Data(ns2, f2, "chebyshev_n", -1, 1);
 
-    // 第四个问题：Hermite 插值预测车辆位置和速度
+    // Hermite
     // Given data points
     std::vector<double> time = {0, 3, 5, 8, 13};
     std::vector<double> displacement = {0, 225, 383, 623, 993};
@@ -119,14 +114,12 @@ int main() {
 
     double Time = 10.0;
 
-    // Part (a): Predict displacement and velocity at t = 10
     double Position = hermite(time, displacement, velocity, Time);
     double Velocity = hermite1(time, displacement, velocity, Time);
 
     std::cout << "position: " << Position << " feet" << std::endl;
     std::cout << "velocity: " << Velocity << " feet per second" << std::endl;
 
-    // Part (b): Check if the car ever exceeds the speed limit (81 feet per second)
     bool Limit = false;
     for (double t = time.front(); t <= time.back(); t += 0.1) {
         double speed = hermite1(time, displacement, velocity, t);
@@ -142,7 +135,7 @@ int main() {
         std::cout << "No overspeed" << std::endl;
     }
 
-    // 第五个问题：幼虫体重预测
+    // 幼虫体重预测
     std::vector<double> days = {0, 6, 10, 13, 17, 20, 28};
     std::vector<double> sp1 = {6.67, 17.3, 42.7, 37.3, 30.1, 29.3, 28.7};
     std::vector<double> sp2 = {6.67, 16.1, 18.9, 15.0, 10.6, 9.44, 8.89};
