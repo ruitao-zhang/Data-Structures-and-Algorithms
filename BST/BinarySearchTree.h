@@ -156,13 +156,13 @@ private:
     void remove(const Comparable &x, BinaryNode *&t)
     {
         if (t == nullptr)
-            return; // Item not found; do nothing
+            return; 
 
         if (x < t->element)
             remove(x, t->left);
         else if (t->element < x)
             remove(x, t->right);
-        else if (t->left != nullptr && t->right != nullptr) // Two children
+        else if (t->left != nullptr && t->right != nullptr) 
         {
             t->element = detachMin(t->right)->element;
         }
@@ -200,7 +200,7 @@ private:
         else if (t->element < x)
             return contains(x, t->right);
         else
-            return true; // Match
+            return true; 
     }
 
     void makeEmpty(BinaryNode *&t)
