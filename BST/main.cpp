@@ -5,7 +5,7 @@
 #include <queue>
 using namespace std;
 
-void testRemove() {
+void test() {
     BinarySearchTree<int> bst;
 
     bst.insert(50);
@@ -60,6 +60,6 @@ void testRemove() {
 }
 
 int main() {
-    testRemove();
+    test();
     return 0;
 }
