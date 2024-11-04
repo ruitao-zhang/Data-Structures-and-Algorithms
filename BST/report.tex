@@ -1,1 +1,184 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{xcolor}
+\usepackage{xeCJK}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\setlength{\parindent}{2em}
+\lstset{
+  language= C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{green},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
 
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{BinarySearchTree}
+
+\author{张睿涛 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+
+\date{Due time: \today}
+\maketitle
+\section*{remove函数}
+\subsection*{1.代码}
+\begin{lstlisting}
+    void remove(const Comparable &x, BinaryNode *&t)
+    {
+        if (t == nullptr)
+            return; 
+
+        if (x < t->element)
+            remove(x, t->left);
+        else if (t->element < x)
+            remove(x, t->right);
+        else if (t->left != nullptr && t->right != nullptr) 
+        {
+            t->element = detachMin(t->right)->element;
+        }
+        else
+        {
+            BinaryNode *oldNode = t;
+            t = (t->left != nullptr) ? t->left : t->right;
+            delete oldNode;
+        }
+    }
+\end{lstlisting}
+\subsection*{2.流程}
+\begin{itemize}
+    \item \textbf{空}：
+    \begin{itemize}
+        \item 如果当前节点 $t$ 为 $\text{nullptr}$，则函数直接返回。
+    \end{itemize}
+    \begin{lstlisting}
+        if (t == nullptr)
+                return;
+    \end{lstlisting}
+    \item \textbf{查找元素}：
+    \begin{itemize}
+        \item 若要删除的元素 $x < t.\text{element}$，则递归在左子树中查找：$remove(x, t.\text{left})$。
+        \begin{lstlisting}
+        if (x < t->element)
+            remove(x, t->left);
+        \end{lstlisting}
+        \item 若 $x > t.\text{element}$，则在右子树中查找：$remove(x, t.\text{right})$。
+        \begin{lstlisting}
+        else if (t->element < x)
+            remove(x, t->right);
+        \end{lstlisting}
+    \end{itemize}
+    
+    \item \textbf{找到节点}：
+    \begin{itemize}
+        \item 当 $x = t.\text{element}$，根据节点的子节点情况，有三种情况：
+        \begin{enumerate}
+            \item \textbf{树叶}：将 $t$ 指向 $\text{nullptr}$。
+            \item \textbf{有一个子节点}：将 $t$ 指向其唯一子节点（$t = t.\text{left}$ 或 $t = t.\text{right}$）。
+            \begin{lstlisting}
+        BinaryNode *oldNode = t;
+        t = (t->left != nullptr) ? t->left : t->right;
+        delete oldNode;
+            \end{lstlisting}
+            \item \textbf{有两个子节点}：调用 $detachMin$ 从右子树中找到并分离最小节点，并用该节点的值替换要删除节点的值。
+            \begin{lstlisting}
+        else if (t->left != nullptr && t->right != nullptr) {
+            t->element = detachMin(t->right)->element;
+        }
+            \end{lstlisting}
+        \end{enumerate}
+    \end{itemize}
+\end{itemize}
+
+\section*{detachMin函数}
+\subsection*{1.代码}
+\begin{lstlisting}
+BinaryNode *detachMin(BinaryNode *&t)
+    {
+        if (t == nullptr)
+            return nullptr;
+
+        if (t->left == nullptr)
+        {
+            BinaryNode *minNode = t;
+            t = t->right;
+            return minNode;
+        }
+        return detachMin(t->left);
+    }
+\end{lstlisting}
+\subsection*{2.流程}
+\begin{itemize}
+    \item \textbf{空}：
+    \begin{itemize}
+        \item 若当前节点 $t$ 为 $\text{nullptr}$，返回 $\text{nullptr}$，表示没有最小节点。
+    \end{itemize}
+    \begin{lstlisting}
+       if (t == nullptr)
+            return nullptr;
+    \end{lstlisting}
+    \item \textbf{查找最小节点}：
+    \begin{itemize}
+        \item 函数递归遍历当前节点的左子节点，找到最小节点。
+    \end{itemize}
+    
+    \item \textbf{分离节点}：
+    \begin{itemize}
+        \item 当达到最左侧节点（$t.\text{left}$ 为 $\text{nullptr}$）时，存储该节点的指针 $minNode$，并将 $t$ 指向其右子节点：$t = t.\text{right}$。
+        \item 返回得到的 $minNode$(最小元素)。
+        \begin{lstlisting}
+    if (t->left == nullptr)
+    {
+        BinaryNode *minNode = t;
+        t = t->right;
+        return minNode;
+    }
+        \end{lstlisting}
+    \end{itemize}
+\end{itemize}
+\newpage
+\section*{测试结果及分析}
+\begin{itemize}
+    \item 初始二叉搜索树为50 30 70 20 40 60 80，测试函数test执行了下列步骤：
+    \begin{itemize}
+         \item 删去树叶节点(20)
+         \item 删去有一个子节点的节点(30)
+         \item 删去有两个子节点的节点(50)
+         \item 删去一个不存在的元素(100)
+         \item 删到只剩一个元素位置
+         \item 删去最后一个元素(60)
+         \item 在空树中执行删除
+    \end{itemize}
+    \item 得到的结果为：
+    \begin{itemize}
+        \item Remove 20 (leaf): 50 30 70 40 60 80 \\  分析：判断20为树叶位置，直接删去。
+        \item Remove 30 (one child): 50 40 70 60 80 \\ 分析：判断30具有一个子节点，把t指向了其子节点40，使40上移至30处，删去30。
+        \item Remove 50 (two children): 60 40 70 80 \\ 分析：判断50具有两个子节点，再通过datechMin的判断，找到了50的右子树中的最小元素60，并将50替换成60.
+        \item Remove 100(non-existent): 60 40 70 80 \\ 分析：找不到100，则什么都不做。
+        \item Remove 40 70 and 80: 60 \\ 分析：过渡步骤
+        \item Remove last node (60): Empty tree \\ 分析：剩唯一一个元素时，判断为树叶位置，直接删去。
+        \item Remove from empty tree: Empty tree \\ 分析：找不到10，则什么都不做。
+    \end{itemize}
+\end{itemize}
+
+\end{document}
