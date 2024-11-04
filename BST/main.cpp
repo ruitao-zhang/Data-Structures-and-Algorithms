@@ -7,7 +7,6 @@
 void testRemove() {
     BinarySearchTree<int> bst;
 
-    // 插入初始数据
     bst.insert(50);
     bst.insert(30);
     bst.insert(70);
@@ -16,10 +15,10 @@ void testRemove() {
     bst.insert(60);
     bst.insert(80);
 
-    std::cout << "Initial tree (level-order):" << std::endl;
-    bst.printLevelOrder(); // 修改为层级遍历输出
+    std::cout << "Initial tree:" << std::endl;
+    bst.printLevelOrder(); (按照层输出）
 
-    // 测试删除叶子节点
+    // 测试删除树叶节点
     bst.remove(20);
     std::cout << "Remove 20:" << std::endl;
     bst.printLevelOrder();
@@ -39,7 +38,7 @@ void testRemove() {
     std::cout << "Remove 100(non-existent):" << std::endl;
     bst.printLevelOrder();
 
-    // 删除所有节点
+    // 删除节点至只剩一个
     bst.remove(40);
     bst.remove(70);
     bst.remove(80);
