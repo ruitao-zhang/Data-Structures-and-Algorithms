@@ -1,0 +1,76 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{setspace}
+\setlength{\parindent}{2em}
+\lstset{
+  language= C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{green},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{实现remove函数修改的说明}
+
+\author{张睿涛 ZhangRuitao 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+\date{Due time: \today}
+\maketitle
+\begin{onehalfspacing}
+
+\section*{说明}
+\begin{itemize}
+    \item  \textbf{删除思路:}在删除后，确保每个节点的平衡因子在 -1 到 1 。若某个节点的平衡因子超出这个范围，则通过进行旋转操作（左旋或右旋）以恢复平衡。
+    \item  \textbf{remove 函数}
+    \begin{itemize}
+        \item \textbf{查找节点}:首先，根据传入的值 x 在树中查找待删除的节点。
+        \item \textbf{节点删除操作}:一旦找到待删除的节点 t，根据 t 的子节点情况进行不同的处理：
+        \begin{itemize}
+            \item \textbf{若 t 有两个子节点：}找到 t 右子树的最小节点，并将其值复制到 t 中。之后，递归删除 t 右子树中的最小节点(利用detachMin函数)。
+            \item \textbf{若 t 只有一个或没有子节点：}若 t 的左子树不为空，则将 t 替换为其左子树；否则，将 t 替换为其右子树。即删除 t，并将它的子树提升到 t 的位置。
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{更新每个节点高度:}删除节点后，更新受影响节点的高度。高度通过 $updateHeight(t)$ 函数更新，该函数计算节点的左右子树高度，并令节点的高度为 $max(\text{左子树高度}, \text{右子树高度}) + 1$。
+    \item \textbf{平衡调整:}删除节点后，检查节点的平衡因子。平衡因子由 
+    $ balanceFactor(t)$ 计算：\\
+    \[
+    balanceFactor(t) = height(t->left) - height(t->right)
+    \]
+    根据平衡因子的值，进行以下操作：
+    \begin{itemize}
+        \item \textbf{大于 1（左重）：}如果左子树的平衡因子小于 0，则进行左旋操作(将当前节点与其左子树交换，使得左子树成为新的根节点)，将左子树的右子树向上提，然后再进行右旋操作。否则，直接进行右旋操作，调整当前节点的平衡。
+        \item \textbf{小于 -1（右重）：}如果右子树的平衡因子大于 0，则进行右旋操作(将当前节点与其右子树交换，使得右子树成为新的根节点)，将右子树的左子树向上提，然后再进行左旋操作。否则，直接进行左旋操作，调整当前节点的平衡。
+    \end{itemize}
+\end{itemize}
+\end{onehalfspacing}
+
+\end{document}
+
