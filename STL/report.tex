@@ -1,1 +1,239 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\setlength{\parindent}{2em}
+\lstset{
+  language= C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{green},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
 
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{用STL工具实现堆排序算法}
+
+\author{张睿涛 Zhang Ruitao 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+\date{Due time: \today}
+\maketitle
+
+\section*{一. 整体设计思路}
+
+\begin{enumerate}
+    \item 基于 \texttt{std::make\_heap} 和 \texttt{std::pop\_heap} 的原理实现手动堆排序；
+    \item 生成测试序列：随机序列、有序序列、逆序序列、以及部分重复序列；
+    \item 通过 \texttt{std::chrono} 测量手动堆排序与 STL 堆排序的耗时，并进行对比；
+    \item 通过自定义检查函数验证排序正确性。
+\end{enumerate}
+
+\section*{二. 函数功能与实现细节}
+
+\subsection*{1.堆排序函数(heapSort)}
+\textbf{功能}：实现基于堆操作的排序。
+
+\textbf{实现细节}：
+\begin{enumerate}
+    \item 使用 \texttt{makeheap} 将数组转换为最大堆；
+    \item 使用 \texttt{popheap} 将堆顶元素逐个移至序列末尾；
+\end{enumerate}
+
+\textbf{实现代码}：
+\begin{lstlisting}
+void heapSort(vector<int>& vec) {
+    makeHeap(vec); 
+    for (size_t i = vec.size(); i > 1; --i) {
+        popheap(vec, i); 
+    }
+}
+\end{lstlisting}
+
+\subsection*{2.手动堆调整(heapify)}
+\textbf{功能}：调整以某个节点为根的子树,使其满足堆的性质：
+
+\textbf{实现细节：}
+\begin{enumerate}
+    \item 比较当前节点和它的左右子节点，找到最大（或最小）的值。
+    \item 如果当前节点不是最大（或最小）的值，与较大的子节点交换位置。
+    \item 递归地对交换位置后的子树进行调整，直到整个子树满足堆的性质。
+\end{enumerate}
+
+\textbf{实现代码}
+\begin{lstlisting}
+void heapify(vector<int>& vec, size_t n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && vec[left] > vec[largest]) {
+        largest = left;
+    }
+
+    if (right < n && vec[right] > vec[largest]) {
+        largest = right;
+    }
+
+    if (largest != i) {
+        swap(vec[i], vec[largest]);
+        heapify(vec, n, largest);
+    }
+}
+\end{lstlisting}
+
+\subsection*{3.手动堆构建(makeHeap)}
+\textbf{功能}：将一个数组转化为堆
+
+\textbf{实现细节}：从最后一个非叶子节点开始（索引为 $\frac{1}{2}n-1$），逐步向上调用 heapify,保证当前节点及其子树满足堆的性质。
+
+\textbf{实现代码}
+\begin{lstlisting}
+void makeHeap(vector<int>& vec) {
+    size_t n = vec.size();
+    for (int i = n / 2 - 1; i >= 0; --i) {
+        heapify(vec, n, i);
+    }
+}
+\end{lstlisting}
+
+\subsection*{4.手动pop\_heap(popheap)}
+\textbf{功能}：将堆顶移动到数组末尾，同时调整剩余部分使其仍然是一个堆。
+
+\textbf{实现细节}：将堆顶元素与当前堆的最后一个元素交换。调整剩余部分（heapSize - 1）为一个堆。
+
+\textbf{实现代码}：
+
+\begin{lstlisting}
+void popheap(vector<int>& vec, size_t heapSize) {
+    if (heapSize > 1) {
+        swap(vec[0], vec[heapSize - 1]);
+        heapify(vec, heapSize - 1, 0);
+    }
+}
+\end{lstlisting}
+
+\subsection*{5.STL 堆排序(SortHeap)}
+\textbf{功能}：使用标准库的 \texttt{std::sort\_heap} 实现排序。
+
+\textbf{实现代码}：
+\begin{lstlisting}
+void SortHeap(vector<int>& vec) {
+    make_heap(vec.begin(), vec.end());
+    sort_heap(vec.begin(), vec.end());
+}
+\end{lstlisting}
+
+\subsection*{6.检查函数 (check)}
+\textbf{功能}：验证排序结果是否按升序排列。
+
+\textbf{实现代码}：
+\begin{lstlisting}
+bool check(const vector<int>& vec) {
+    for (size_t i = 1; i < vec.size(); ++i) {
+        if (vec[i - 1] > vec[i]) return false;
+    }
+    return true;
+}
+\end{lstlisting}
+
+\subsection*{7.测试数据生成函数}
+生成方式：
+\begin{enumerate}
+    \item 随机序列：使用均匀分布生成；
+    \item 有序序列：从小到大递增；
+    \item 逆序序列：从大到小递减；
+    \item 部分重复序列：生成指定数量的唯一值。
+\end{enumerate}
+
+\textbf{生成随机序列的代码}：
+\begin{lstlisting}
+vector<int> generateRandomSequence(size_t n, int minVal = 0, int maxVal = 1000000) {
+    vector<int> vec(n);
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> dist(minVal, maxVal);
+    for (auto& val : vec) {
+        val = dist(gen);
+    }
+    return vec;
+}
+\end{lstlisting}
+
+\section*{三. 测试流程}
+
+\begin{enumerate}
+    \item 生成长度为 1,000,000 的随机序列、有序序列、逆序序列、部分重复序列；
+    \item 对每种序列分别进行手动堆排序与 \texttt{std::sort\_heap} 排序；
+    \item 通过 \texttt{check} 函数验证排序结果；
+    \item 记录两种排序方法的耗时并进行比较大小。
+\end{enumerate}
+
+\section*{四. 测试结果}
+
+\noindent \textbf{测试数据}：长度为 1,000,000 的序列。
+
+\begin{verbatim}
+测试: 随机序列
+手动用时: 491 ms
+STL sort_heap time: 524 ms
+比较: 手动的比sort_heap快33 ms
+
+测试: 有序序列
+手动用时: 328 ms
+STL sort_heap time: 372 ms
+比较: 手动的比sort_heap快44 ms
+
+测试: 逆序序列
+手动用时: 328 ms
+STL sort_heap time: 393 ms
+比较: 手动的比sort_heap快65 ms
+
+测试: 部分元素重复序列
+手动用时: 418 ms
+STL sort_heap time: 479 ms
+比较: 手动的比sort_heap快61 ms
+\end{verbatim}
+
+\textbf{表格}：
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+测试类型         & 手动用时 (ms) & sort\_heap 用时 (ms) & 比较 \\ \midrule
+随机序列         & 491           & 524                      & 手动的比 sort\_heap 快 33 ms \\
+有序序列         & 328           & 372                      & 手动的比 sort\_heap 快 44 ms \\
+逆序序列         & 328           & 393                      & 手动的比 sort\_heap 快 65 ms \\
+部分元素重复序列 & 418           & 479                      & 手动的比 sort\_heap 快 61 ms \\ \bottomrule
+\end{tabular}
+\caption{手动排序与 STL sort\_heap 用时对比}
+\label{tab:performance_comparison}
+\end{table}
+
+\textbf{无报错}：经check函数判断，最终结果没有出现“手动失败”和“STL失败”，故结果正确。
+\end{document}
