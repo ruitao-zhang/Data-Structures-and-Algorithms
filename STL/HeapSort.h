@@ -111,12 +111,4 @@ vector<int> Rpnumber(size_t n, int uniqueCount) {
     return vec;
 }
 
-// 打印向量的内容
-void printVector(const vector<int>& vec) {
-    for (const auto& val : vec) {
-        cout << val << " ";
-    }
-    cout << endl;
-}
-
 #endif 
