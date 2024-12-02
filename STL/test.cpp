@@ -35,7 +35,7 @@ void test(const string& description, vector<int> data) {
   
     //计算用时
     auto time_stl = chrono::duration_cast<chrono::milliseconds>(end_stl - start_stl).count();
-    cout << "STL sort_heap time: " << time_stl << " ms" << endl;
+    cout << "STL sort_heap用时: " << time_stl << " ms" << endl;
 
     // 比较性能(用时)
     cout << "比较: ";
