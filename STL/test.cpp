@@ -37,7 +37,7 @@ void test(const string& description, vector<int> data) {
     auto time_stl = chrono::duration_cast<chrono::milliseconds>(end_stl - start_stl).count();
     cout << "STL sort_heap用时: " << time_stl << " ms" << endl;
 
-    // 比较性能(用时)
+    // 比较用时
     cout << "比较: ";
     if (time_hand < time_stl) {
         cout << "手动的比sort_heap快" << (time_stl - time_hand) << " ms" << endl;
@@ -64,7 +64,7 @@ int main() {
     test("逆序序列", c);
 
     // 测试部分重复序列
-    vector<int> d = Rpnumber(n, 1000); // 设有 1000 个不同值
+    vector<int> d = Rpnumber(n, 1000); // 设有1000个不同值
     test("部分元素重复序列", d);
 
     return 0;
