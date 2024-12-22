@@ -61,9 +61,9 @@ double rule(double a, double b, char op) {
         case '-': return a - b;
         case '*': return a * b;
         case '/': 
-            if (b == 0) throw runtime_error("错误: 除数不能为零!");
+            if (b == 0) throw runtime_error("");
             return a / b;
-        default: throw runtime_error("无效的操作符");
+        default: throw runtime_error("");
     }
 }
 \end{lstlisting}
@@ -73,20 +73,20 @@ double rule(double a, double b, char op) {
     \item 是否为空
     \begin{lstlisting}
     if (a.empty()) {
-        throw runtime_error("错误: 表达式为空!");
+        throw runtime_error("");
     }
     \end{lstlisting}
     \item 不能以运算符开头（但可以以左括号开头）
     \begin{lstlisting}
     if (a[0] == '+' || a[0] == '-' || a[0] == '*' || a[0] == '/') {
-        throw runtime_error("错误: 表达式不能以运算符开头!");
+        throw runtime_error("");
     }
     \end{lstlisting}
     \item 能以运算符结尾（但可以以右括号结尾）
     \begin{lstlisting}
     if (a[a.size() - 1] == '+' || a[a.size() - 1] == '-' || 
         a[a.size() - 1] == '*' || a[a.size() - 1] == '/') {
-        throw runtime_error("错误: 表达式不能以运算符结尾!");
+        throw runtime_error("");
     }
 
     \end{lstlisting}
@@ -96,20 +96,20 @@ double rule(double a, double b, char op) {
         \begin{lstlisting}
     if (i + 1 < a.size() && (a[i + 1] == '+' || a[i + 1] == '-' || a[i + 1] == '*' || 
     a[i + 1] == '/' || a[i+1] == ')')) {
-         throw runtime_error("错误: 左括号后不能跟运算符!");
+         throw runtime_error("");
     }
         \end{lstlisting}
         \item 右括号前不能是运算符
         \begin{lstlisting}
     if (i > 0 && (a[i - 1] == '+' || a[i - 1] == '-' || 
     a[i - 1] == '*' || a[i - 1] == '/' || a[i+1] == '(')) {
-        throw runtime_error("错误: 右括号前不能跟运算符!");
+        throw runtime_error("");
     }
         \end{lstlisting}
         \item 左右括号数量是否匹配
         \begin{lstlisting}
     if (left != right) {
-        throw runtime_error("错误: 括号数量不匹配!");
+        throw runtime_error("");
     }
         \end{lstlisting}    
     \end{enumerate}
@@ -117,7 +117,7 @@ double rule(double a, double b, char op) {
     \begin{lstlisting}
     for (size_t i = 0; i < a.size(); ++i) {
         if (a[i] == '/' && i + 1 < a.size() && a[i + 1] == '0') {
-            throw runtime_error("错误: 除数不能为零!");
+            throw runtime_error("");
         }
     }
     \end{lstlisting}
@@ -126,7 +126,7 @@ double rule(double a, double b, char op) {
     for (size_t i = 1; i < a.size(); ++i) {
         if ((a[i] == '+' || a[i] == '-' || a[i] == '*' || a[i] == '/') && 
             (a[i - 1] == '+' || a[i - 1] == '-' || a[i - 1] == '*' || a[i - 1] == '/')) {
-            throw runtime_error("错误: 运算符不能连续出现!");
+            throw runtime_error("");
         }
     }
     \end{lstlisting} 
@@ -160,7 +160,7 @@ double rule(double a, double b, char op) {
                 //处理多个小数点
                 if (a[i] == '.') {
                     if (k) {
-                        throw runtime_error("错误: 不允许多个小数点");
+                        throw runtime_error("");
                     }
                     k = true;    // 标记小数点
                 } else {
