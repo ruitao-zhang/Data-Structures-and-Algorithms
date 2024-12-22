@@ -10,7 +10,7 @@ using namespace std;
 int main() {
     string expression;
     cout << "计算: ";
-    getline(cin, expression);  // 获取包含空格的输入3b
+    getline(cin, expression);  
 
     try {
         double result = evaluate(expression);
