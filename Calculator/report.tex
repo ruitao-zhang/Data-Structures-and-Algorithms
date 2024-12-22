@@ -1,0 +1,272 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\setlength{\parindent}{2em}
+\lstset{
+  language= C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{red},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{四则运算计算器}
+
+\author{张睿涛 Zhang Ruitao 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+\date{Due time: \today}
+\maketitle
+\section*{一、设计思路}
+\subsection*{1.设置运算符优先级}
+\begin{lstlisting}
+    int set(char op) {
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    return 0;
+}
+\end{lstlisting}
+\subsection*{2.处理四则运算}
+\begin{lstlisting}
+double rule(double a, double b, char op) {
+    switch (op) {
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
+        case '/': 
+            if (b == 0) throw runtime_error("错误: 除数不能为零!");
+            return a / b;
+        default: throw runtime_error("无效的操作符");
+    }
+}
+\end{lstlisting}
+\subsection*{3.检查合法性}
+
+\begin{enumerate}
+    \item 是否为空
+    \begin{lstlisting}
+    if (a.empty()) {
+        throw runtime_error("错误: 表达式为空!");
+    }
+    \end{lstlisting}
+    \item 不能以运算符开头（但可以以左括号开头）
+    \begin{lstlisting}
+    if (a[0] == '+' || a[0] == '-' || a[0] == '*' || a[0] == '/') {
+        throw runtime_error("错误: 表达式不能以运算符开头!");
+    }
+    \end{lstlisting}
+    \item 能以运算符结尾（但可以以右括号结尾）
+    \begin{lstlisting}
+    if (a[a.size() - 1] == '+' || a[a.size() - 1] == '-' || 
+        a[a.size() - 1] == '*' || a[a.size() - 1] == '/') {
+        throw runtime_error("错误: 表达式不能以运算符结尾!");
+    }
+
+    \end{lstlisting}
+    \item 括号数目是否匹配及空括号处理
+    \begin{enumerate}
+        \item 左括号后不能是运算符
+        \begin{lstlisting}
+    if (i + 1 < a.size() && (a[i + 1] == '+' || a[i + 1] == '-' || a[i + 1] == '*' || 
+    a[i + 1] == '/' || a[i+1] == ')')) {
+         throw runtime_error("错误: 左括号后不能跟运算符!");
+    }
+        \end{lstlisting}
+        \item 右括号前不能是运算符
+        \begin{lstlisting}
+    if (i > 0 && (a[i - 1] == '+' || a[i - 1] == '-' || 
+    a[i - 1] == '*' || a[i - 1] == '/' || a[i+1] == '(')) {
+        throw runtime_error("错误: 右括号前不能跟运算符!");
+    }
+        \end{lstlisting}
+        \item 左右括号数量是否匹配
+        \begin{lstlisting}
+    if (left != right) {
+        throw runtime_error("错误: 括号数量不匹配!");
+    }
+        \end{lstlisting}    
+    \end{enumerate}
+    \item 除数为零
+    \begin{lstlisting}
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (a[i] == '/' && i + 1 < a.size() && a[i + 1] == '0') {
+            throw runtime_error("错误: 除数不能为零!");
+        }
+    }
+    \end{lstlisting}
+    \item 运算符连续出现
+    \begin{lstlisting}
+    for (size_t i = 1; i < a.size(); ++i) {
+        if ((a[i] == '+' || a[i] == '-' || a[i] == '*' || a[i] == '/') && 
+            (a[i - 1] == '+' || a[i - 1] == '-' || a[i - 1] == '*' || a[i - 1] == '/')) {
+            throw runtime_error("错误: 运算符不能连续出现!");
+        }
+    }
+    \end{lstlisting} 
+\end{enumerate} 
+
+\subsection*{4.计算表达式}
+\begin{enumerate}
+    \item 用栈来处理表达式中的操作数和运算符
+    \begin{lstlisting}
+    stack<double> num;  // 存储操作数
+    stack<char> opt;       // 存储运算符
+    \end{lstlisting}
+    \item 遍历所有字符
+    \begin{enumerate}
+        \item 忽略空格
+        \begin{lstlisting}
+    if (isspace(expression[i])) {
+        continue;
+    }
+        \end{lstlisting}
+        \item 处理数字，尤其是浮点数
+        \begin{lstlisting}
+    if (isdigit(a[i]) || a[i] == '.') {
+            // 如果有小数点，转换为浮点数
+            double m = 0;
+            bool k = false;
+            double n = 1;
+
+            // 读取数字，直到遇到非数字和非小数点
+            while (i < a.size() && (isdigit(a[i]) || a[i] == '.')) {
+                //处理多个小数点
+                if (a[i] == '.') {
+                    if (k) {
+                        throw runtime_error("错误: 不允许多个小数点");
+                    }
+                    k = true;    // 标记小数点
+                } else {
+                    m = m * 10 + (a[i] - '0');
+                    if (k) {
+                        n *= 10;  // 若是小数，则调整小数点位置
+                    }
+                }
+                ++i;
+            }
+
+            if (k) {
+                m /= n;  // 调整小数点后的数字
+            }
+        \end{lstlisting}
+        \item 栈操作1
+        \begin{lstlisting}
+    else if (a[i] == '(') {
+        opt.push(a[i]);        // 左括号，压栈
+    } else if (a[i] == ')') {
+        while (!opt.empty() && opt.top() != '(') {   // 右括号，计算至左括号
+            double num2 = num.top(); num.pop();     // 获取栈顶的第二个操作数
+            double num1 = num.top(); num.pop();        // 获取栈顶的第一个操作数
+            char op = opt.top(); opt.pop();        // 获取栈顶的运算符
+            num.push(rule(num1, num2, op));       // 执行运算并将结果压入操作数栈
+        }
+        opt.pop();  // 弹出 '('
+    } else if (a[i] == '+' || a[i] == '-' || a[i] == '*' || a[i] == '/') {
+            // 优先处理栈中的运算符
+        while (!opt.empty() && set(opt.top()) >= set(a[i])) {     
+        // 取出操作数并执行运算，直到当前运算符优先级大于栈顶运算符
+            double num2 = num.top(); num.pop();
+            double num1 = num.top(); num.pop();
+            char op = opt.top(); opt.pop();
+            num.push(rule(num1, num2, op));
+        }
+            // 当前运算符压栈
+        opt.push(a[i]);
+    }
+}
+        \end{lstlisting}
+        \item 栈操作2
+        \begin{lstlisting}
+     // 处理剩下的运算符
+    while (!opt.empty()) {
+        double num2 = num.top(); num.pop();          
+        double num1 = num.top(); num.pop();          
+        char op = opt.top(); opt.pop();                    
+        num.push(rule(num1, num2, op));
+    }
+
+    // 得到最终结果(栈顶)
+    return num.top();
+        \end{lstlisting}
+    \end{enumerate}
+\end{enumerate}
+
+\section*{二、测试用例及结果分析}
+\renewcommand{\arraystretch}{2}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+测试用例 & 表达式 & 计算结果 & 结果是否正确 \\
+\hline
+加法(整数) & 1+1 & 2 & YES \\
+\hline
+加法(小数) & 1.2+4.352 & 5.552 & YES\\
+\hline
+减法(整数) & 3300-241 & 3059 & YES \\
+\hline
+减法(小数) & 5.425-3.412 & 2.013 & YES\\
+\hline
+除法(整数) & 224/30 & 7.46667 & YES \\
+\hline
+除法(小数) & 2.45/3.56 & 0.688202 & YES\\
+\hline
+混合计算(整数) & 11+3*5-4/2 & 24 & YES \\
+\hline
+混合计算(小数) & 3.4+3.21*6.4-8.4/3.5 & 21.544 & YES\\
+\hline
+单个括号的混合计算(整数) & 11+3*(5-4)/2 & 12.5 & YES \\
+\hline
+单个括号的混合计算(小数) & 3.4+3.21*(6.4-8.4)/3.5 & 1.56571 & YES\\
+\hline
+多重括号的混合计算(整数) & (11+3*(5-4))/2 & 7 & YES \\
+\hline
+多重括号的混合计算(小数) & (3.4+3.21*(6.4-8.4))/3.5 & -0.862857 & YES\\
+\hline
+非法：运算符处于开头 & +100 & ILLEGAL & YES \\
+\hline
+非法：运算符处于结尾 & 100- & ILLEGAL & YES \\
+\hline
+非法：连续运算符 & 1++1 & ILLEGAL & YES \\
+\hline
+非法：除数为0 & 234/0 & ILLEGAL & YES \\
+\hline
+非法：括号不匹配 & 1+(1+1 & ILLEGAL & YES\\
+\hline
+非法：( + 其他运算符 & 1+(*1) & ILLEGAL & YES \\
+\hline
+非法：其他运算符 + ) & 1+)1 & ILLEGAL & YES\\
+\hline
+合法：括号处于开头  & (1+3)*3 & 12 & YES\\
+\hline
+合法：括号处于结尾 & 1+3*(3+2) & 16 & YES \\
+\hline
+\end{tabular}
+\end{center}
+\end{document}
