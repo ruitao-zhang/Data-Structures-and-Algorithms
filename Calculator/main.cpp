@@ -8,17 +8,16 @@
 using namespace std;
 
 int main() {
-    string expression;
-    cout << "计算: ";
-    getline(cin, expression);  
+    string a;
+    cout << "计算：";
+    getline(cin, a);  
 
     try {
-        double result = evaluate(expression);
-        cout << "结果: " << result << endl;
+        double b = calculate(a);
+        cout << "结果: " << b << endl;
     } catch (const runtime_error& e) {
         cout << "ILLEGAL" << endl;
     }
 
     return 0;
 }
-
