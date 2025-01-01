@@ -1,0 +1,156 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\setlength{\parindent}{2em}
+\lstset{
+  language= C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{red},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+\linespread{1.5}
+
+\begin{document}
+\title{报告}
+
+\author{张睿涛 Zhang Ruitao 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+\date{Due time: \today}
+
+\maketitle
+
+\section*{A}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.1.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.2.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.3.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.4.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.5.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.6.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\section*{B}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.6.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/1.6.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\section*{C}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/3.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\section*{D}
+三次B样条插值在指定点的误差：\\
+E_S(-3.5) = -0.07241896540758129\\
+E_S(-3) = -0.08499955496859522\\
+E_S(-0.5) = -0.7648317286296568\\
+E_S(0) = -0.7813461709627464\\
+E_S(0.5) = -0.7648317286296568\\
+E_S(3) = -0.08499955496859522\\
+E_S(3.5) = -0.07241896540758129\\
+
+二次B样条插值在指定点的误差：\\
+E_S(-3.5) = -0.02831996281550777\\
+E_S(-3) = -0.06599384706312209\\
+E_S(-0.5) = -0.20653891247038558\\
+E_S(0) = -0.7967291109128755\\
+E_S(0.5) = -0.5803775311811162\\
+E_S(3) = -0.08164219218754697\\
+E_S(3.5) = -0.04959340070201645\\
+
+\begin{enumerate}
+    \item \textbf{为什么有些误差接近机器精度？}当插值节点恰好位于插值点时，误差往往非常小。特别是在节点附近，B样条插值可以精确地逼近原函数，因为这些点本身是插值点。又因为数值计算的精度受到计算机浮点数表示的限制，因此误差会收敛到一个接近机器精度的小数值。
+    \item \textbf{哪种B样条插值更加准确？}三次比二次更加精确。这是因为三次插值具有更高的平滑度，尤其是在函数的导数（斜率）处。从误差的大小看，三次的误差一般要比二次小，因此更适合用于较高平滑度要求
+\end{enumerate}
+
+
+\section*{E}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/5.1.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/5.2.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+\section*{F}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/6.1.png}
+    \caption{}
+    \label{fig:example}
+\end{figure}
+分差表：
+['(0 - x)_+^2' '(1 - 0)' '(2 - 0)']
+['(1 - x)_+^2' '(2 - 1)' 0]
+['(2 - x)_+^2' 0 0]
+\end{document}
