@@ -1,0 +1,273 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\setlength{\parindent}{2em}
+\lstset{
+  language= C++,                
+  basicstyle=\ttfamily\small,   
+  keywordstyle=\color{blue},    
+  stringstyle=\color{red},      
+  commentstyle=\color{red},   
+  numbers=left,                 
+  numberstyle=\tiny,           
+  stepnumber=1,                 
+  tabsize=4,                    
+  showspaces=false,             
+  showstringspaces=false        
+}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+\linespread{1.5}
+
+\begin{document}
+\title{设计与数学说明}
+
+\author{张睿涛 Zhang Ruitao 3210105252
+  \thanks{Electronic address: \texttt{3210105252@zju.edu.cn}}}
+\affil{(Information and Computing Science 2101), Zhejiang University }
+
+\date{Due time: \today}
+
+\maketitle
+
+\section{BSplineBasis.h}
+\subsection{结构说明}
+\begin{itemize}
+    \item \textbf{成员变量：}
+    \begin{itemize}
+        \item \texttt{k}：存储节点序列的 \texttt{std::vector<double>} 类型容器。
+        \item \texttt{degree}：表示B-Spline的阶数。
+    \end{itemize}
+    \item \textbf{成员函数：}
+    \begin{itemize}
+        \item \texttt{BSplineBasis(const std::vector<double>& k, int degree)}：初始化节点序列和B-Spline的阶数，并确保节点数至少为 \texttt{degree + 2}。
+        \item \texttt{f0(int i, int n, double t)}：递归计算B-Spline基函数的值。
+        \item \texttt{getKnots()}：返回节点序列。
+        \item \texttt{getDegree()}：返回B-Spline的阶数。
+    \end{itemize}
+\end{itemize}
+
+\subsection{设计思路}
+
+\subsection{递归}
+
+- 对于0阶基函数 \( B_i^0(t) \)，它是一个分段函数，在每个区间 \([k[i], k[i+1])\) 上取值1，其它地方取值0。
+- 对于高阶基函数 \( B_i^n(t) \)，其计算依赖于前一阶的基函数。递归的形式是：
+\[
+B_i^n(t) = \frac{t - \text{k}[i]}{\text{k}[i+n] - \text{k}[i]} B_i^{n-1}(t) + \frac{\text{k}[i+n+1] - t}{\text{k}[i+n+1] - \text{k}[i+1]} B_{i+1}^{n-1}(t)
+\]
+
+\subsection{检查}
+f0
+构造函数通过检查输入的节点序列长度是否满足至少为 \texttt{degree + 2} 个节点来确保节点的有效性。
+
+\subsection{类的功能接口}
+
+\subsubsection{构造函数}
+
+\[
+\texttt{BSplineBasis(const std::vector<double>& k, int degree)}
+\]
+初始化B-Spline基函数类，接受节点序列和B-Spline阶数。构造函数内部检查节点的数量是否满足B-Spline阶数的要求。
+
+\subsubsection{基函数计算函数}
+
+\[
+\texttt{f0(int i, int n, double t)}
+\]
+该函数递归计算并返回B-Spline基函数 \( B_i^n(t) \) 的值。首先处理0阶基函数，然后递归计算更高阶的基函数。
+
+\section{BSplineCurve.h}
+\subsection{结构说明}
+\begin{itemize}
+    \item \textbf{成员变量：}
+    \begin{itemize}
+        \item \texttt{basis}：类型为 \texttt{BSplineBasis} 的对象，用于存储B-Spline基函数对象。这些基函数是计算B-Spline曲线值所必需的。
+        \item \texttt{c}：类型为 \texttt{std::vector<double>} 的容器，存储B-Spline的权重。
+    \end{itemize}
+    \item \textbf{成员函数：}
+    \begin{itemize}
+        \item 构造函数 \texttt{BSplineCurve(const BSplineBasis\& basis, const std::vector<double>\& c)}：初始化B-Spline基函数和权重，并检查权重数量是否与B-Spline基函数匹配。
+        \item \texttt{f1(double t)}：计算并返回B-Spline曲线在参数 \( t \) 下的值 \( S(t) \)。
+    \end{itemize}
+\end{itemize}
+
+\subsection{设计思路}
+
+\subsubsection{B-Spline曲线的构建}
+\begin{enumerate}
+    \item \textbf{初始化：} 在构造函数中，传入了一个B-Spline基函数对象 \texttt{basis} 和权重 \texttt{c}。且B-Spline的节点数应为权重数加上基函数阶数加1:
+    \[
+    \text{c} + \text{B-Spline阶数} + 1 = \text{节点数}
+    \]
+    如果不匹配，则非法。
+    \item \textbf{曲线计算：} 在 \texttt{f1} 函数中，B-Spline曲线在给定参数 \( t \) 下的值 \( S(t) \) 通过所有点与其相应基函数的加权和计算：
+    \[
+    S(t) = \sum_{i} a_i B_i^n(t)
+    \]
+\end{enumerate}
+
+\section{类的功能接口}
+
+\subsection{构造函数}
+
+\[
+\texttt{BSplineCurve(const BSplineBasis\& basis, const std::vector<double>\& c)}
+\]
+该函数初始化B-Spline基函数对象和权重，并确保其相匹配。
+
+\subsection{曲线计算函数}
+
+\[
+\texttt{f1(double t)}
+\]
+该函数计算并返回B-Spline曲线在给定参数 \( t \) 处的值。它通过遍历所有控制点，将控制点的权重与相应的B-Spline基函数的值相乘，然后加权求和得到曲线值：
+\[
+S(t) = \sum_{i} a_i B_i^n(t)
+\]
+其中 \( a_i \) 是第 \( i \) 个点，\( B_i^n(t) \) 是第 \( i \) 个基函数在参数 \( t \) 处的值。
+
+\section{CubicSpline.h}
+\subsection{类的结构说明}
+\subsubsection{成员变量}
+\begin{itemize}
+    \item \( x \)：存储样本点的横坐标。
+    \item \( y \)：存储样本点的纵坐标。
+    \item \( a, b, c, d \)：存储三次样条的系数，分别表示每个区间的三次多项式的常数项、一次项、二次项和三次项系数。
+\end{itemize}
+
+\subsection{成员函数}
+\begin{itemize}
+    \item \texttt{CubicSpline(const std::vector<double>& x, const std::vector<double>& y)}：构造函数，用于初始化并进行输入数据的验证。
+    \item \texttt{f3(double xVal)}：根据给定的 \( x \) 值计算插值结果。
+    \item \texttt{g0()}：计算三次样条的系数 \( a \), \( b \), \( c \), \( d \)。
+    \item \texttt{g1(double xVal)}：找出给定 \( x \) 值所在的区间。
+\end{itemize}
+
+\section{设计思路}
+
+\begin{itemize}
+    \item \textbf{初始化和验证：} 初始化时检查 \( x \) 和 \( y \) 的有效性，保证 \( x \) 必须严格递增，且 \( x \) 和 \( y \) 的大小相等。
+    \item \textbf{计算样条系数：} 通过三次样条插值法计算每个区间的四个系数 \( a \), \( b \), \( c \), \( d \)。
+    \item \textbf{插值计算：} 给定 \( x \) 值，根据对应的三次多项式系数计算插值值。
+\end{itemize}
+
+\subsection{类的功能接口}
+\subsection{构造函数}
+\begin{verbatim}
+CubicSpline(const std::vector<double>& x, const std::vector<double>& y)
+\end{verbatim}
+\begin{itemize}
+    \item \textbf{功能：} 初始化三次样条插值类的对象，并检查输入数据的有效性
+    \item \textbf{参数：} 
+    \begin{itemize}
+        \item x：一个包含横坐标的向量。
+        \item y：一个包含纵坐标的向量。
+    \end{itemize}
+\end{itemize}
+
+\subsection{插值函数}
+
+\begin{verbatim}
+double f3(double xval) const
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{功能：} 根据给定的 \( xval \) 计算在三次样条曲线上的插值结果。
+    \item \textbf{返回值：} 给定 \( xval \) 对应的插值值。
+\end{itemize}
+
+\subsection{计算系数}
+
+\begin{verbatim}
+void g0()
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{功能：} 计算三次样条的四个系数 \( a \), \( b \), \( c \), \( d \)，这四个系数用于表示每个区间内的三次多项式。
+\end{itemize}
+
+\subsection{寻找区间}
+
+\begin{verbatim}
+size_t g1(double xval) const
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{功能：} 给定 \( xval \)，通过二分查找确定其所属的区间，并返回该区间的索引。
+    \item \textbf{返回值：} \( xval \) 所在区间的索引。
+\end{itemize}
+
+\section{pp.h}
+\subsection{结构说明}
+\subsubsection{成员变量}
+
+\begin{itemize}
+    \item \texttt{c}：一个二维向量，每个子向量代表一个区间的多项式系数。每个子向量对应的多项式系数依次为常数项、一次项、二次项等。
+    \item \texttt{b}：一个向量，存储多项式的分段点，为每个区间的端点。长度为 \(n+1\) 的向量表示 \(n\) 个区间。
+\end{itemize}
+
+\subsection{成员函数}
+
+\begin{itemize}
+    \item \texttt{PP}：构造函数，初始化分段点和每个区间的多项式系数。。
+    \item \texttt{f4(double x)}：给定一个 \(x\) 值，计算并返回分段多项式的值。它遍历所有区间，找到包含 \(x\) 的区间，并使用对应的多项式系数计算值。
+\end{itemize}
+
+\subsection{设计思路}
+
+\begin{itemize}
+    \item 
+    输入：构造函数接收两个参数:每个区间的多项式系数和分段点。函数 \texttt{f4} 接收一个 \(x\) 值，计算并返回在分段多项式上的插值结果。
+    
+    \item 输出：返回 \(x\) 对应的多项式值。
+
+\end{itemize}
+
+\subsection{类的功能接口}
+
+\subsection{构造函数PP}
+
+\begin{verbatim}
+PP(const std::vector<std::vector<double>>& c, const std::vector<double>& b)
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{功能：} 初始化分段多项式对象。
+    \item \textbf{参数：} 
+    \begin{itemize}
+        \item coefficients：一个二维向量，每个子向量包含一个区间的多项式系数。
+        \item breakpoints：一个向量，包含分段点，表示每个区间的端点。
+    \end{itemize}
+\end{itemize}
+
+\subsection{评估函数f4}
+
+\begin{verbatim}
+double f4(double x) const
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{功能：} 估计给定点 \( x \) 在分段多项式上的值。
+    \item \textbf{返回值：} 对应 \( x \) 的多项式值。
+\end{itemize}
+
+
+\end{document}
+
